@@ -1,7 +1,7 @@
 import express from "express";
 import morgan from "morgan";
 import responseTime from "response-time";
-import counterMetric from "./helper.js";
+import counterMetric from "./counter.helper.js";
 import masterRouter from "./routes/index.js";
 
 const app = express();
@@ -28,7 +28,7 @@ app.use(middleware);
 
 app.use("/api/v1" ,masterRouter);
 
-app.get("/", (req, res) => {
+app.get("/", (req, res) => {z
     res.status(200).json({
         success: true,
         message: "This is the home page"
