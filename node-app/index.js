@@ -1,8 +1,9 @@
 import express from "express";
 import morgan from "morgan";
 import responseTime from "response-time";
-import counterMetric from "./counter.helper.js";
-import gaugeMetric from "./gauge.helper.js";
+import CounterClient from "./counter.helper.js";
+import GaugeClient from "./gauge.helper.js";
+import HistogramClient from "./histogram.helper.js";
 import masterRouter from "./routes/index.js";
 
 const app = express();
@@ -13,25 +14,37 @@ const middleware = (req, res, next) => {
         return next();
     }
 
+    let startTime = Date.now();
+
     // Increase the gauge value
-    gaugeMetric.inc({
+    GaugeClient.inc({
         method: req.method,
         route: req.originalUrl,
     });
 
     res.on("finish", () => {
+        let endTime = Date.now();
+        let duration = endTime - startTime; 
+
         // Increase the counter.
-        counterMetric.inc({
+        CounterClient.inc({
             method: req.method,
             route: req.originalUrl,
             status_code: res.statusCode
         });
 
         // Decrease the gauge value
-        gaugeMetric.dec({
+        GaugeClient.dec({
             method: req.method,
             route: req.originalUrl,
-        })
+        });
+
+        // Observer the duration of time it takes 
+        HistogramClient.observe({
+            method: req.method,
+            route: req.originalUrl,
+            status_code: res.statusCode
+        }, duration);
     });
     next();
 }
@@ -48,7 +61,7 @@ app.use("/api/v1" ,masterRouter);
 
 app.get("/", async (req, res) => {
 
-    await new Promise(resolve => setTimeout(resolve, 5000));
+    // await new Promise(resolve => setTimeout(resolve, 5000));
 
     res.status(200).json({
         success: true,
