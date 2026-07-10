@@ -4,7 +4,7 @@ services:
   node-app:
     build: ./node-app
     ports:
-      - "3000:3000"
+      - "8080:8080"
     networks:
       - monitoring
 
@@ -16,6 +16,15 @@ services:
       - "9090:9090"
     networks:
       - monitoring
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    networks:
+      - monitoring
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
 
 networks:
   monitoring:
