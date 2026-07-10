@@ -73,7 +73,7 @@ app.get("/health", (req, res) => {
     res.status(200).send("<h1>App is healthy....</h1>");
 });
 
-const PORT = 3000;
+const PORT = 8080;
 
 app.listen(PORT, ()=>{
     console.log(`App is running at http://localhost:${PORT}`);
